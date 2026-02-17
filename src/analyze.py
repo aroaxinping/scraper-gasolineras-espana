@@ -7,7 +7,9 @@ import os
 import sys
 from glob import glob
 
+import sqlite3
 import pandas as pd
+from src.database import DB_PATH
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 
@@ -30,47 +32,61 @@ def mean_by_province(df: pd.DataFrame, col: str) -> pd.DataFrame:
     )
 
 
-def compare_weeks(current: pd.DataFrame, previous: pd.DataFrame) -> None:
-    """Compara medias entre semana actual y anterior."""
-    for col in ["gasolina95", "diesel"]:
-        curr_mean = current[col].mean()
-        prev_mean = previous[col].mean()
-        diff = curr_mean - prev_mean
-        pct = (diff / prev_mean) * 100 if prev_mean else 0
-        direction = "subio" if diff > 0 else "bajo"
-        print(f"  {col}: {prev_mean:.3f} -> {curr_mean:.3f} "
-              f"({direction} {abs(pct):.2f}%)")
+def analyze_trends_sqlite():
+    """Análisis de tendencias usando la base de datos SQLite."""
+    if not os.path.exists(DB_PATH):
+        print("Base de datos no encontrada. Ejecuta scraper.py primero.")
+        return
+
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        print("\n--- Análisis de Tendencias (SQLite) ---")
+        # Media nacional por fecha
+        query = """
+        SELECT fecha, AVG(gasolina95) as avg_95, AVG(diesel) as avg_diesel 
+        FROM precios_historicos 
+        GROUP BY fecha 
+        ORDER BY fecha ASC
+        """
+        df_trends = pd.read_sql(query, conn)
+        print(df_trends.to_string(index=False))
+
+        # Gasolinera más barata en los últimos 6 meses (ejemplo de consulta compleja)
+        print("\nTop 3 gasolineras más baratas históricamente (Gasolina 95):")
+        query_cheap = """
+        SELECT estacion, municipio, provincia, gasolina95, fecha 
+        FROM precios_historicos 
+        WHERE gasolina95 IS NOT NULL
+        ORDER BY gasolina95 ASC 
+        LIMIT 3
+        """
+        df_cheap = pd.read_sql(query_cheap, conn)
+        print(df_cheap.to_string(index=False))
+    finally:
+        conn.close()
 
 
 def main():
+    # Análisis tradicional basado en CSV
     files = get_csv_files()
-    if not files:
-        print("No hay CSVs en data/. Ejecuta primero scraper.py.")
-        sys.exit(1)
+    if files:
+        latest = pd.read_csv(files[0])
+        print(f"Último archivo: {os.path.basename(files[0])}")
+        
+        # Comparación con semana anterior
+        if len(files) >= 2:
+            previous = pd.read_csv(files[1])
+            print(f"\nCambio vs semana anterior ({os.path.basename(files[1])}):")
+            for col in ["gasolina95", "diesel"]:
+                curr_mean = latest[col].mean()
+                prev_mean = previous[col].mean()
+                diff = curr_mean - prev_mean
+                pct = (diff / prev_mean) * 100 if prev_mean else 0
+                direction = "subió" if diff > 0 else "bajó"
+                print(f"  {col}: {prev_mean:.3f} -> {curr_mean:.3f} ({direction} {abs(pct):.2f}%)")
 
-    print(f"Archivos encontrados: {len(files)}")
-    latest = pd.read_csv(files[0])
-    print(f"\nUltimo archivo: {os.path.basename(files[0])}")
-    print(f"Estaciones: {len(latest)}")
-
-    # Top 5 provincias mas baratas y mas caras
-    for col, label in [("gasolina95", "Gasolina 95"), ("diesel", "Diesel")]:
-        ranking = mean_by_province(latest, col)
-        print(f"\n--- {label} por provincia ---")
-        print("Mas baratas:")
-        for _, row in ranking.head(5).iterrows():
-            print(f"  {row['provincia']}: {row[f'media_{col}']:.3f} EUR/L")
-        print("Mas caras:")
-        for _, row in ranking.tail(5).iterrows():
-            print(f"  {row['provincia']}: {row[f'media_{col}']:.3f} EUR/L")
-
-    # Comparacion con semana anterior
-    if len(files) >= 2:
-        previous = pd.read_csv(files[1])
-        print(f"\nCambio vs semana anterior ({os.path.basename(files[1])}):")
-        compare_weeks(latest, previous)
-    else:
-        print("\nSolo hay un archivo, no se puede comparar con semana anterior.")
+    # Nuevo análisis basado en SQLite
+    analyze_trends_sqlite()
 
 
 if __name__ == "__main__":
