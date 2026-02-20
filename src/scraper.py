@@ -10,7 +10,7 @@ import json
 from datetime import date
 
 import pandas as pd
-import requests
+from curl_cffi import requests
 
 from src.utils import normalize_province, normalize_string
 from src.database import save_to_sqlite, get_last_average_prices
@@ -48,25 +48,22 @@ def fetch_data() -> dict:
     }
     
     # Usar sesión para mantener la conexión y manejar cookies automáticamente
-    with requests.Session() as session:
+    with requests.Session(impersonate="chrome120") as session:
         session.headers.update(headers)
-        
+
         for attempt in range(1, MAX_RETRIES + 1):
             try:
-                # Pequeño delay antes del primer intento para no ser "explosivos"
                 if attempt == 1:
                     time.sleep(1)
-                    
+
                 print(f"Intento {attempt}/{MAX_RETRIES} (vía Session)...")
-                
-                # Deshabilitamos la verificación SSL solo como último recurso 
-                # (algunos servidores del gobierno tienen cadenas de certificados rotas)
+
                 resp = session.get(API_URL, timeout=90)
                 resp.raise_for_status()
                 
                 return resp.json()
                 
-            except (requests.RequestException, ValueError) as e:
+            except (requests.errors.RequestsError, ValueError) as e:
                 delay = INITIAL_RETRY_DELAY * (2 ** (attempt - 1))
                 print(f"Error en intento {attempt}: {e}")
                 
