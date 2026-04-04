@@ -1,8 +1,8 @@
-# Scraper Gasolineras España
+# Scraper Gasolineras Espana
 
 [![Scrape](https://github.com/aroaxinping/scraper-gasolineras-espana/actions/workflows/scrape.yml/badge.svg)](https://github.com/aroaxinping/scraper-gasolineras-espana/actions/workflows/scrape.yml)
 
-Monitor de precios de carburantes en España con histórico persistente, mapas interactivos y alertas automáticas.
+Monitor de precios de carburantes en Espana con histórico persistente, mapas interactivos y alertas automáticas.
 
 Consulta las novedades de la versión 2.0 en el [CHANGELOG.md](./CHANGELOG.md).
 
