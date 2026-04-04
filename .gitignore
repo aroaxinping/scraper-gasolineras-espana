@@ -1,5 +1,25 @@
+# Python
 __pycache__/
 *.pyc
-.env
+*.pyo
+*.pyd
+.Python
+env/
 venv/
 .venv/
+.env
+
+# Proyecto: Datos y Resultados (Ignorar para el PR)
+data/*.csv
+data/*.db
+data/*.json
+data/entrada_bruta.txt
+
+# El mapa pesa mucho y es un resultado local
+mapa_precios.html
+
+# IDEs y Editores
+.vscode/
+.idea/
+.DS_Store
+*.swp
