@@ -1,4 +1,4 @@
-# Scraper Gasolineras España v2.0 🚀
+# Scraper Gasolineras España
 
 [![Scrape](https://github.com/aroaxinping/scraper-gasolineras-espana/actions/workflows/scrape.yml/badge.svg)](https://github.com/aroaxinping/scraper-gasolineras-espana/actions/workflows/scrape.yml)
 
