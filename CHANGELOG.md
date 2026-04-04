@@ -8,7 +8,7 @@ y este proyecto se rige por el [Versionado Semántico](https://semver.org/spec/v
 ## [2.1.0] - 2026-04-04
 
 ### Añadido
-- **Interfaz de Mapa Premium**: Popups del mapa mejorados con tablas HTML/CSS profesionales, colores según el precio y mejor tipografía.
+- **Interfaz de Mapa Interactiva**: Popups del mapa mejorados con tablas HTML/CSS profesionales, colores según el precio y mejor tipografía.
 - **Importador de Datos Brutos**: Nueva utilidad `src/tools/import_raw.py` para procesar automáticamente texto "sucio" copiado directamente de las tablas del navegador.
 - **Limpieza de Datos Agresiva**: Implementada limpieza de etiquetas y validación de precios en el importador para asegurar la alta calidad de los datos.
 
