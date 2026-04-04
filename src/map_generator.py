@@ -42,7 +42,7 @@ def generate_map(df: pd.DataFrame):
     for _, row in df_map.iterrows():
         color = get_color(row["gasolina95"], p25, p75)
         
-        # Popup estilo "Premium" con HTML/CSS
+        # Popup estilo interactivo con HTML/CSS
         popup_html = f"""
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-width: 200px;">
             <div style="background-color: {color}; color: white; padding: 10px; border-radius: 5px 5px 0 0; text-align: center;">
