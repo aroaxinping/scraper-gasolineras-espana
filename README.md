@@ -2,30 +2,33 @@
 
 [![Scrape](https://github.com/aroaxinping/scraper-gasolineras-espana/actions/workflows/scrape.yml/badge.svg)](https://github.com/aroaxinping/scraper-gasolineras-espana/actions/workflows/scrape.yml)
 
-Scraper automatizado que recoge precios de gasolineras en Espana cada semana desde la API publica de MINETUR (Ministerio de Industria).
+Monitor de precios de carburantes en Espana con histórico persistente, mapas interactivos y alertas automáticas.
 
-Los datos se guardan en `data/precios_YYYY-MM-DD.csv` y se actualizan automaticamente cada lunes a las 8:00 UTC via GitHub Actions.
+Consulta las novedades de la versión 2.0 en el [CHANGELOG.md](./CHANGELOG.md).
 
-## Uso manual
+## 🛠️ Instalación y Uso
 
 ```bash
 pip install -r requirements.txt
-python src/scraper.py
-python src/analyze.py
+python -m src.scraper
 ```
 
-## Fuente de datos
+#### Solución rápida (Si la API falla)
+1. Abre [este enlace](https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/) en tu navegador.
+2. Tienes dos opciones:
+   - **Opción A (Manual)**: Selecciona todo el código JSON, pégalo en `data/fichero_api.json` y corre el script.
+   - **Opción B (Automática - RECOMENDADA)**: Si el JSON es muy grande o te lías, selecciona **TODO** el contenido de la página (Ctrl+A), pégalo en `data/entrada_bruta.txt` y ejecuta:
+     ```bash
+     python -m src.tools.import_raw
+     ```
+     Luego ya puedes ejecutar el script normal `python -m src.scraper`. lo procesará automáticamente.
 
-API REST publica del Ministerio de Industria (MINETUR/CNMC):
-https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/
+## 📁 Estructura del Proyecto
+- `data/`: CSVs semanales, Base de Datos SQLite y backups.
+- `src/scraper.py`: Motor principal (Descarga, DB, Alertas y Mapas).
+- `src/analyze.py`: Herramientas de análisis histórico.
+- `src/utils.py`: Normalización de datos.
+- `mapa_precios.html`: Mapa interactivo generado.
 
-No requiere API key.
-
-## Estructura
-
-```
-data/              <- CSVs con precios semanales
-src/scraper.py     <- descarga y parsea datos de la API
-src/analyze.py     <- estadisticas resumen
-.github/workflows/ <- automatizacion semanal
-```
+## ⚖️ Fuente de datos
+API REST pública del Ministerio de Industria y Energía. No requiere API Key.
